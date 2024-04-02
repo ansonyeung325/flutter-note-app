@@ -24,13 +24,6 @@ class _SplashScreenState extends State<SplashScreen> {
     getUserStatus();
   }
 
-  // Future<void> getUserSetting()async{
-  //   await Future.delayed(const Duration(seconds: 3)).then((_) {
-  //     final appState = Provider.of<AppProvider>(context,listen: false);
-  //     appState
-  //   });
-  // }
-
   Future<void> getUserStatus() async {
     await Future.delayed(const Duration(seconds: 3)).then((_) {
       final authState = Provider.of<AuthProvider>(context, listen: false);
@@ -43,9 +36,9 @@ class _SplashScreenState extends State<SplashScreen> {
       }
       authState.getCurrentUser();
       if (authState.isLoggedIn) {
-        Navigator.pushReplacementNamed(context, AppRouteName.homeScreen);
+        Navigator.pushReplacementNamed(context, routePath.homeScreen);
       } else {
-        Navigator.pushReplacementNamed(context, AppRouteName.authScreen);
+        Navigator.pushReplacementNamed(context, routePath.authScreen);
       }
     });
   }

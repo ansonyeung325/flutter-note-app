@@ -73,6 +73,7 @@ class _StateSettingScreen extends State<SettingScreen> {
                     func: (value) {
                       setState(() {
                         appState.toggleTheme();
+                        debugPrint("${appState.appTheme.primaryColor}");
                       });
                     }),
                 Row(
@@ -87,7 +88,7 @@ class _StateSettingScreen extends State<SettingScreen> {
                                     side: BorderSide(color: Colors.orange)))),
                         onPressed: () {
                           authState.signOut();
-                          Navigator.pushReplacementNamed(context, AppRouteName.authScreen);
+                          Navigator.pushReplacementNamed(context, routePath.authScreen);
                         },
                         child: Row(
                           children: [

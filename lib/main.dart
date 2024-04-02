@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
         themeMode: ThemeMode.system,
         theme: Provider.of<AppProvider>(context).appTheme,
         darkTheme: AAppTheme.darkTheme,
-        initialRoute: AppRouteName.splashScreen,
+        initialRoute: routePath.splashScreen,
         onGenerateRoute: RouteGenerator.generateRoute,
         navigatorObservers: [routeObserver],
       ),

@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, AppRouteName.noteScreen,
+          Navigator.pushNamed(context, routePath.noteScreen,
               arguments: title);
         },
         child: Container(
@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
         floatingActionButton: FloatingActionButton(
             shape: CircleBorder(),
             onPressed: () {
-              Navigator.pushNamed(context, AppRouteName.noteScreen,arguments: "");
+              Navigator.pushNamed(context, routePath.noteScreen,arguments: "");
             },
             child: Icon(Icons.create_rounded)),
         widgetChild: Padding(

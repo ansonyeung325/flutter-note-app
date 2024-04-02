@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:couple/utils/modelKeys/base_model_keys.dart';
 import 'package:couple/utils/modelKeys/note_model_keys.dart';
@@ -33,4 +35,5 @@ class NoteModel extends BaseModel {
       updatedAt: docSnapshot.get(BaseModelKeys.updatedAt),
     );
   }
+
 }

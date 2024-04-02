@@ -9,8 +9,8 @@ extension RouteNameExtension on AppRouteName {
         return "/auth";
       case AppRouteName.noteScreen:
         return "/note";
-      case AppRouteName.testScreen:
-        return "/test";
+      case AppRouteName.profileScreen:
+        return "/profile";
       case AppRouteName.settingScreen:
         return "/setting";
       default:

@@ -60,7 +60,7 @@ class _AuthScreenState extends State<AuthScreen> {
             username: usernameController.text.trim());
         if (context.mounted && profile != null) {
           Provider.of<AuthProvider>(context, listen: false).setProfile(profile);
-          Navigator.pushNamed(context, AppRouteName.homeScreen);
+          Navigator.pushNamed(context, routePath.homeScreen);
         }
         AMessageToast.showToast(msg: "SignUp successfully");
       } on FirebaseAuthException catch (e) {
@@ -78,7 +78,7 @@ class _AuthScreenState extends State<AuthScreen> {
             password: passwordController.text.trim());
         if (context.mounted && profile != null) {
           Provider.of<AuthProvider>(context, listen: false).setProfile(profile);
-          Navigator.pushNamed(context, AppRouteName.homeScreen);
+          Navigator.pushNamed(context, routePath.homeScreen);
         }
         AMessageToast.showToast(msg: "SignIn successfully");
         return profile;

@@ -1,1 +1,1 @@
-enum AppRouteName { homeScreen, authScreen, noteScreen, testScreen, settingScreen }
+enum AppRouteName { homeScreen, authScreen, noteScreen, testScreen, settingScreen, profileScreen }

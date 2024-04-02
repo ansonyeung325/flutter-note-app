@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:couple/models/note_model.dart';
+import 'package:couple/utils/string_converter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
 
 class NoteScreen extends StatefulWidget {
   const NoteScreen({required this.content, super.key});
@@ -15,7 +17,6 @@ class _NoteScreenState extends State<NoteScreen> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final EdgeInsetsGeometry screenPadding =
       const EdgeInsets.symmetric(horizontal: 12);
-  QuillController _richTexController = QuillController.basic();
   final StreamController<String> _inputStreamController =
       StreamController<String>();
   TextEditingController contentController = TextEditingController();
@@ -40,17 +41,21 @@ class _NoteScreenState extends State<NoteScreen> {
       oldContent = widget.content!;
       contentController.text = oldContent!;
     }
+    autoSaveChange();
   }
 
-  void autoSaveChange() {}
+  Future<void> autoSaveChange() async {
+    Stream stream = _inputStreamController.stream;
+    stream.listen((event) async {
+      await Future.delayed(const Duration(seconds: 5));
+
+      String encoded = StringConverter.encodeContent(event);
+      debugPrint(encoded);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    Stream stream = _inputStreamController.stream;
-    stream.listen((event) {
-      debugPrint("$event");
-    });
-
     return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         bottomNavigationBar: Container(

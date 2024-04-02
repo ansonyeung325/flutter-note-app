@@ -3,7 +3,10 @@ import 'package:couple/providers/app_provider.dart';
 import 'package:couple/providers/auth_provider.dart';
 import 'package:couple/screens/setting_screen.dart';
 import 'package:couple/utils/enums.dart';
+import 'package:couple/utils/extensions/enum_to_string.dart';
+import 'package:couple/utils/route/path.dart';
 import 'package:couple/widgets/side_menu_item.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -62,41 +65,45 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
                 ),
               ),
               SideMenuItem(title: "Home", destination: AppRouteName.homeScreen),
-              SideMenuItem(title: "Test", destination: AppRouteName.testScreen),
               SideMenuItem(title: "Setting", destination: AppRouteName.settingScreen),
               const Spacer(),
-              Container(
-                height: 80,
-                padding: const EdgeInsets.all(8.0),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColorLight,
-                    borderRadius: const BorderRadius.all(Radius.circular(6))),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                        backgroundColor: Colors.grey,
-                        radius: 40,
-                        child: (authState.getProfile?.profileImage != null)
-                            ? null
-                            : const Icon(Icons.perm_identity_outlined)),
-                    const SizedBox(width: 20),
-                    Expanded(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "${authState.getProfile?.username}",
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(
-                          "${authState.getProfile?.email}",
-                          style: Theme.of(context).textTheme.labelLarge,
-                        )
-                      ],
-                    ))
-                  ],
+              GestureDetector(
+                onTap: (){
+                  Navigator.popAndPushNamed(context, AppRouteName.profileScreen.enumToString());
+                },
+                child: Container(
+                  height: 80,
+                  padding: const EdgeInsets.all(8.0),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColorLight,
+                      borderRadius: const BorderRadius.all(Radius.circular(6))),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                          backgroundColor: Colors.grey,
+                          radius: 40,
+                          child: (authState.getProfile?.profileImage != null)
+                              ? null
+                              : const Icon(Icons.perm_identity_outlined)),
+                      const SizedBox(width: 20),
+                      Expanded(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${authState.getProfile?.username}",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          Text(
+                            "${authState.getProfile?.email}",
+                            style: Theme.of(context).textTheme.labelLarge,
+                          )
+                        ],
+                      ))
+                    ],
+                  ),
                 ),
               )
             ],
