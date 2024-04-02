@@ -1,16 +1,10 @@
-import 'package:couple/models/user_profile_model.dart';
 import 'package:couple/providers/app_provider.dart';
 import 'package:couple/providers/auth_provider.dart';
-import 'package:couple/services/auth_services.dart';
-import 'package:couple/services/user_service.dart';
 import 'package:couple/themes/theme.dart';
-import 'package:couple/utils/logger.dart';
 import 'package:couple/utils/route/generator.dart';
 import 'package:couple/utils/route/path.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
