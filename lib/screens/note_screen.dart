@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:couple/models/note_model.dart';
-import 'package:couple/utils/string_converter.dart';
+import 'package:couple/utils/components/quill_text_editor.dart';
+import 'package:couple/utils/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 class NoteScreen extends StatefulWidget {
   const NoteScreen({required this.content, super.key});
@@ -17,40 +18,47 @@ class _NoteScreenState extends State<NoteScreen> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final EdgeInsetsGeometry screenPadding =
       const EdgeInsets.symmetric(horizontal: 12);
-  final StreamController<String> _inputStreamController =
-      StreamController<String>();
-  TextEditingController contentController = TextEditingController();
-  TextEditingController titleController = TextEditingController();
+  late StreamSubscription<String> titleSubscription;
+  StreamController<String> streamTitleController = StreamController<String>();
+  final TextEditingController _titleController = TextEditingController();
+  final QuillController _quillController = QuillController.basic();
+  final FocusNode _quillFocusNode = FocusNode();
   String? oldContent;
   String? newContent;
+  String title = "New Note";
+  bool isTyping = false;
 
   @override
   void initState() {
     super.initState();
     loadData();
+    autoSaveContent();
   }
 
   @override
   void dispose() {
     super.dispose();
-    contentController.dispose();
+    _quillController.dispose();
+    _titleController.dispose();
+    titleSubscription.cancel();
   }
 
   void loadData() {
+    titleSubscription = streamTitleController.stream.listen(
+      (String value) {
+        title = value;
+        setState(() {});
+      },
+    );
+
     if (widget.content != null) {
       oldContent = widget.content!;
-      contentController.text = oldContent!;
     }
-    autoSaveChange();
   }
 
-  Future<void> autoSaveChange() async {
-    Stream stream = _inputStreamController.stream;
-    stream.listen((event) async {
-      await Future.delayed(const Duration(seconds: 5));
-
-      String encoded = StringConverter.encodeContent(event);
-      debugPrint(encoded);
+  void autoSaveContent() {
+    _quillController.document.changes.listen((event) async {
+      await Future.delayed(const Duration(seconds: 3));
     });
   }
 
@@ -58,26 +66,8 @@ class _NoteScreenState extends State<NoteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        bottomNavigationBar: Container(
-            height: 100,
-            padding: screenPadding,
-            decoration: const BoxDecoration(color: Colors.transparent),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.checklist),
-                  highlightColor: Colors.transparent,
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.create),
-                  highlightColor: Colors.transparent,
-                ),
-              ],
-            )),
         appBar: AppBar(
+          title: Text(title.isEmpty ? "New Note" : title),
           automaticallyImplyLeading: false,
           scrolledUnderElevation: 0,
           backgroundColor: Colors.transparent,
@@ -93,52 +83,63 @@ class _NoteScreenState extends State<NoteScreen> {
             ],
           ),
           actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.more_horiz),
-              highlightColor: Colors.transparent,
-            )
+            PopupMenuButton(
+                position: PopupMenuPosition.under,
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                      onTap: (){
+                        logger(from: "Note Screen",message: "${_quillController.document.toDelta().toJson()}");
+                      },
+                      child: Text("Save",style: Theme.of(context).textTheme.bodyLarge))
+                ])
           ],
         ),
-        body: SingleChildScrollView(
-          child: Container(
-            padding: screenPadding,
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    maxLines: 1,
-                    textCapitalization: TextCapitalization.sentences,
-                    style: Theme.of(context).textTheme.titleLarge,
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(8.0),
-                        filled: true,
-                        fillColor: Colors.grey[300]),
-                    onChanged: (value) {
-                      _inputStreamController.add(value);
-                    },
-                  ),
-                  TextFormField(
-                    controller: contentController,
-                    maxLines: 999999999,
-                    minLines: null,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.only(top: 8.0)),
-                    onChanged: (value) {
-                      _inputStreamController.add(value);
-                    },
-                  ),
-                ],
+        body: SafeArea(
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _titleController,
+                onChanged: (String value) {
+                  streamTitleController.add(value);
+                },
+                style: Theme.of(context).textTheme.headlineMedium,
+                decoration: const InputDecoration(
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                    focusedBorder:
+                        OutlineInputBorder(borderSide: BorderSide.none),
+                    errorBorder:
+                        OutlineInputBorder(borderSide: BorderSide.none),
+                    disabledBorder:
+                        OutlineInputBorder(borderSide: BorderSide.none)),
               ),
-            ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Divider(),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: screenPadding,
+                  child: QuillEditor.basic(
+                    focusNode: _quillFocusNode,
+                    configurations: QuillEditorConfigurations(
+                      controller: _quillController,
+                      sharedConfigurations: const QuillSharedConfigurations(
+                        locale: Locale('en', 'zh'),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+                if (isKeyboardVisible) {
+                  return Container(
+                      child: QuillTextEditor.simpleToolbar(_quillController));
+                }
+                return const SizedBox();
+              }),
+            ],
           ),
         ));
   }

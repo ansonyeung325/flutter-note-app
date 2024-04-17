@@ -4,6 +4,7 @@ import 'package:couple/providers/auth_provider.dart';
 import 'package:couple/screens/setting_screen.dart';
 import 'package:couple/utils/enums.dart';
 import 'package:couple/utils/extensions/enum_to_string.dart';
+import 'package:couple/utils/logger.dart';
 import 'package:couple/utils/route/path.dart';
 import 'package:couple/widgets/side_menu_item.dart';
 import 'package:flutter/cupertino.dart';
@@ -37,8 +38,7 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    final authState = Provider.of<AuthProvider>(context);
-
+    final authState = Provider.of<AuthProvider>(context, listen: true);
     return Drawer(
       backgroundColor: Theme.of(context).drawerTheme.backgroundColor,
       child: SafeArea(
@@ -65,11 +65,14 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
                 ),
               ),
               SideMenuItem(title: "Home", destination: AppRouteName.homeScreen),
-              SideMenuItem(title: "Setting", destination: AppRouteName.settingScreen),
+              SideMenuItem(
+                  title: "Setting", destination: AppRouteName.settingScreen),
               const Spacer(),
               GestureDetector(
-                onTap: (){
-                  Navigator.popAndPushNamed(context, AppRouteName.profileScreen.enumToString());
+                onTap: () {
+                  Navigator.popAndPushNamed(
+                      context, AppRouteName.profileScreen.enumToString(),
+                      arguments: authState.getProfile);
                 },
                 child: Container(
                   height: 80,
@@ -83,9 +86,17 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
                       CircleAvatar(
                           backgroundColor: Colors.grey,
                           radius: 40,
-                          child: (authState.getProfile?.profileImage != null)
-                              ? null
-                              : const Icon(Icons.perm_identity_outlined)),
+                          backgroundImage:
+                              (authState.getProfile?.profileImage != null)
+                                  ? Image.memory(
+                                      authState.getProfile!.profileImage!.data!,
+                                      fit: BoxFit.fill,
+                                    ).image
+                                  : null,
+                          child:
+                              (authState.getProfile?.profileImage?.data == null)
+                                  ? const Icon(Icons.perm_identity_outlined)
+                                  : null),
                       const SizedBox(width: 20),
                       Expanded(
                           child: Column(

@@ -1,3 +1,4 @@
+import 'package:couple/models/user_profile_model.dart';
 import 'package:couple/screens/auth_screen.dart';
 import 'package:couple/screens/home_screens.dart';
 import 'package:couple/screens/note_screen.dart';
@@ -9,7 +10,6 @@ import 'package:couple/utils/route/path.dart';
 import 'package:flutter/material.dart';
 
 class RouteGenerator with RouteAware {
-
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final arg = settings.arguments;
     switch (settings.name) {
@@ -37,7 +37,10 @@ class RouteGenerator with RouteAware {
       case routePath.profileScreen:
         logger(message: "Current route: ${settings.name}", from: "Router");
         return MaterialPageRoute(
-            settings: settings, builder: (_) => const ProfileScreen());
+            settings: settings,
+            builder: (_) => ProfileScreen(
+                  profile: arg as UserProfileModel,
+                ));
       default:
         return MaterialPageRoute(
             settings: settings, builder: (_) => const ErrorScreen());
