@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:couple/models/image_model.dart';
+import 'package:couple/models/setting_model.dart';
 import 'package:couple/services/media_service.dart';
 import 'package:couple/utils/logger.dart';
 import 'package:couple/utils/modelKeys/user_profile_model_keys.dart';
@@ -21,6 +22,12 @@ class UserService {
     } catch (error) {
       debugPrint("$error");
       return null;
+    }
+  }
+
+  Future<SettingModel?> updateSetting(String uid, SettingModel setting) async {
+    try {} catch (error) {
+      logger(from: "UserService updateSetting", message: "$error");
     }
   }
 

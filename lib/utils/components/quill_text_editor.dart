@@ -1,3 +1,4 @@
+import 'package:couple/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
@@ -10,8 +11,18 @@ class QuillTextEditor {
             controller: quillController,
             buttonOptions: QuillSimpleToolbarButtonOptions(
                 base: QuillToolbarBaseButtonOptions(
-                  
-                )),
+                    iconTheme: QuillIconTheme(
+                        iconButtonSelectedData: IconButtonData(
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                          ),
+                          color: ColorConstant.primaryDarkColor,
+                        ),
+                        iconButtonUnselectedData: IconButtonData(
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                          ),
+                        )))),
             sharedConfigurations: const QuillSharedConfigurations(
               locale: Locale('en'),
             ),

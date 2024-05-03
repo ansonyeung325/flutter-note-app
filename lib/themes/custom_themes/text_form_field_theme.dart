@@ -4,11 +4,11 @@ class ATextFormFieldTheme {
   ATextFormFieldTheme._();
 
   static final lightTextFormFieldTheme = InputDecorationTheme(
-      fillColor: Colors.grey[100],
+      fillColor: Colors.black.withOpacity(0.2),
       suffixIconColor: Colors.grey,
       prefixIconColor: Colors.grey,
       contentPadding: const EdgeInsets.symmetric(horizontal: 12,vertical: 12),
-      hintStyle: TextStyle().copyWith(fontSize: 14, color: Colors.grey),
+      hintStyle: TextStyle().copyWith(fontSize: 14, color: Colors.white),
       labelStyle: TextStyle().copyWith(fontSize: 14, color: Colors.grey),
       border: const OutlineInputBorder().copyWith(
           borderRadius: BorderRadius.circular(8),

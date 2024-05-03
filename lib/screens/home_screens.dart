@@ -1,9 +1,10 @@
 import 'package:couple/models/note_model.dart';
-import 'package:couple/providers/app_provider.dart';
 import 'package:couple/providers/auth_provider.dart';
-import 'package:couple/utils/components/general_layout.dart';
+import 'package:couple/services/note_service.dart';
+import 'package:couple/utils/constant.dart';
+import 'package:couple/utils/logger.dart';
 import 'package:couple/utils/route/path.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:couple/widgets/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/search_input.dart';
@@ -18,8 +19,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final EdgeInsetsGeometry screenPadding =
       const EdgeInsets.symmetric(horizontal: 12);
-
-  final List<NoteModel> noteList = [];
+  final NoteService noteService = NoteService();
+  late final AuthProvider authProvider;
+  bool isLoading = false;
+  List<NoteModel> noteList = [];
 
   @override
   void initState() {
@@ -27,23 +30,34 @@ class _HomeScreenState extends State<HomeScreen> {
     loadData();
   }
 
-  Future<void> loadData() async {}
+  Future<void> loadData() async {
+    setState(() {
+      isLoading = true;
+    });
+    authProvider = Provider.of(context, listen: false);
+    noteList =
+        await noteService.getByUserId(authProvider.getProfile!.uid) ?? [];
+    noteList = noteList.map((e) => NoteModel.copy(e)).toList();
+    logger(message: "Note: ${noteList.first.title}", from: "Home Screen");
+    setState(() {
+      isLoading = false;
+    });
+  }
 
-  Widget noteCard(int index) {
-    final String title = noteList[index].title;
+  Widget noteCard(NoteModel note) {
+    final String title = note.title ?? "";
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, routePath.noteScreen,
-              arguments: title);
+          Navigator.pushNamed(context, RoutePath.noteScreen, arguments: note);
         },
         child: Container(
           width: double.infinity,
           height: 100,
           decoration: BoxDecoration(
-              color: Theme.of(context).primaryColorLight,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(6)),
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -80,44 +94,78 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final deviceHeight = MediaQuery.of(context).size.height;
+
     return Consumer<AuthProvider>(builder: (context, profileProvider, child) {
-      return GeneralLayout(
+      return Scaffold(
+        extendBodyBehindAppBar: false,
+        backgroundColor: ColorConstant.primaryColor,
+        drawer: const SideMenu(),
+        bottomNavigationBar: BottomAppBar(
+          height: Theme.of(context).bottomAppBarTheme.height,
+          color: Theme.of(context).bottomAppBarTheme.color,
+          child: Row(
+            children: [IconButton(onPressed: () {}, icon: Icon(Icons.add))],
+          ),
+        ),
+        appBar: AppBar(
+            automaticallyImplyLeading: true,
+            backgroundColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            elevation: 0),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
-            shape: CircleBorder(),
+            shape: Theme.of(context).floatingActionButtonTheme.shape,
             onPressed: () {
-              Navigator.pushNamed(context, routePath.noteScreen,arguments: "");
+              Navigator.pushNamed(context, RoutePath.noteScreen, arguments: "");
             },
-            child: Icon(Icons.create_rounded)),
-        widgetChild: Padding(
-          padding: screenPadding,
-          child: Column(children: [
-            Row(children: [
-              Text("Welcome back",
-                  style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.headlineLarge!.fontSize!,
-                      fontWeight: Theme.of(context)
-                          .textTheme
-                          .headlineLarge!
-                          .fontWeight!,
-                      color: Theme.of(context).primaryColor)),
-            ]),
-            const SizedBox(
-              height: 12,
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            )),
+        body: Stack(
+          children: [
+            ///background layer
+            Padding(
+              padding: EdgeInsets.only(top: deviceHeight / 5),
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+              ),
             ),
-            const SearchInput(),
-            const SizedBox(
-              height: 20,
+            Padding(
+              padding: screenPadding,
+              child: Column(children: [
+                Row(children: [
+                  Text("Welcome back",
+                      style: TextStyle(
+                        fontSize: Theme.of(context)
+                            .textTheme
+                            .headlineLarge!
+                            .fontSize!,
+                        fontWeight: Theme.of(context)
+                            .textTheme
+                            .headlineLarge!
+                            .fontWeight!,
+                      )),
+                ]),
+                const SizedBox(
+                  height: 12,
+                ),
+                const SearchInput(),
+                const SizedBox(
+                  height: 20,
+                ),
+                Expanded(
+                    child: ListView(
+                        scrollDirection: Axis.vertical,
+                        children: noteList
+                            .asMap()
+                            .entries
+                            .map((e) => noteCard(e.value))
+                            .toList()))
+              ]),
             ),
-            Expanded(
-                child: ListView(
-                    scrollDirection: Axis.vertical,
-                    children: noteList
-                        .asMap()
-                        .entries
-                        .map((item) => noteCard(item.key))
-                        .toList()))
-          ]),
+          ],
         ),
       );
     });

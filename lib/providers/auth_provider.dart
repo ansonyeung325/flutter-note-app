@@ -15,7 +15,7 @@ class AuthProvider extends AppProvider {
   UserProfileModel? _profile;
   bool isLoggedIn = false;
 
-  void getCurrentUser() async {
+  Future<void> getCurrentUser() async {
     User? user = _authService.isLoggedIn();
     if (user != null) {
       isLoggedIn = true;

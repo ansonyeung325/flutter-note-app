@@ -1,8 +1,14 @@
+import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart';
+import 'package:couple/models/setting_model.dart';
+import 'package:couple/models/user_profile_model.dart';
 import 'package:couple/providers/app_provider.dart';
 import 'package:couple/providers/auth_provider.dart';
 import 'package:couple/screens/home_screens.dart';
+import 'package:couple/services/user_service.dart';
 import 'package:couple/themes/theme.dart';
+import 'package:couple/utils/enums.dart';
 import 'package:couple/utils/route/path.dart';
+import 'package:couple/widgets/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:lottie/lottie.dart';
@@ -25,22 +31,22 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> getUserStatus() async {
-    await Future.delayed(const Duration(seconds: 3)).then((_) {
-      final authState = Provider.of<AuthProvider>(context, listen: false);
-      final appState = Provider.of<AppProvider>(context, listen: false);
-      bool isDarkMode =
-          SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-              Brightness.dark;
-      if (isDarkMode) {
-        appState.setTheme(AAppTheme.darkTheme);
-      }
-      authState.getCurrentUser();
-      if (authState.isLoggedIn) {
-        Navigator.pushReplacementNamed(context, routePath.homeScreen);
-      } else {
-        Navigator.pushReplacementNamed(context, routePath.authScreen);
-      }
-    });
+    final authState = Provider.of<AuthProvider>(context, listen: false);
+    final appState = Provider.of<AppProvider>(context, listen: false);
+    await authState.getCurrentUser();
+    bool isDarkMode =
+        SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+            Brightness.dark;
+
+    if (isDarkMode) {
+      appState.setTheme(AAppTheme.darkTheme);
+    }
+
+    if (authState.isLoggedIn) {
+      Navigator.pushReplacementNamed(context, RoutePath.homeScreen);
+    } else {
+      Navigator.pushReplacementNamed(context, RoutePath.authScreen);
+    }
   }
 
   Widget _splashBody() {
@@ -53,8 +59,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = Provider.of<AuthProvider>(context);
-
-    return Scaffold(body: _splashBody());
+    return Scaffold(drawer: const SideMenu(), body: _splashBody());
   }
 }

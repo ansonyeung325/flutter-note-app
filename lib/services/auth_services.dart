@@ -1,6 +1,8 @@
+import 'package:couple/models/setting_model.dart';
 import 'package:couple/models/user_profile_model.dart';
 import 'package:couple/providers/app_provider.dart';
 import 'package:couple/services/user_service.dart';
+import 'package:couple/utils/logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,10 +25,11 @@ class AuthServices {
           .createUserWithEmailAndPassword(email: email, password: password);
       UserProfileModel newProfile = UserProfileModel(
           uid: credential.user!.uid,
+          docId: credential.user!.uid,
           username: username,
           email: email,
+          setting: SettingModel(isNotificationOn: false),
           createdAt: Timestamp.now(),
-          docId: credential.user!.uid,
           updatedAt: Timestamp.now());
       await UserService().create(newProfile);
       debugPrint("User signIn: ${credential.user?.email}");
@@ -45,6 +48,9 @@ class AuthServices {
       debugPrint("User signIn: ${credential.user?.email}");
       UserProfileModel? profile =
           await UserService().getByUid(credential.user!.uid);
+      logger(
+          message:
+              "Snapshot From User Collection: ${profile?.setting.isNotificationOn}");
       return profile;
     } catch (error) {
       debugPrint("Service Error: $error");

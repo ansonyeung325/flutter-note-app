@@ -5,19 +5,22 @@ import 'package:couple/utils/route/generator.dart';
 import 'package:couple/utils/route/path.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+final GetIt getIt = GetIt.instance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  getIt.registerSingleton<RouteGenerator>(RouteGenerator());
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider<AppProvider>(
       create: (_) => AppProvider(),
     ),
-  ], child: MyApp()));
+  ], child: const MyApp()));
 }
-
-final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -47,7 +50,7 @@ class _MyAppState extends State<MyApp> {
         themeMode: ThemeMode.system,
         theme: Provider.of<AppProvider>(context).appTheme,
         darkTheme: AAppTheme.darkTheme,
-        initialRoute: routePath.splashScreen,
+        initialRoute: RoutePath.splashScreen,
         onGenerateRoute: RouteGenerator.generateRoute,
         navigatorObservers: [routeObserver],
       ),

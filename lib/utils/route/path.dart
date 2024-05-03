@@ -1,7 +1,7 @@
 //Route path
 
-class routePath {
-  static const homeScreen = "/";
+class RoutePath {
+  static const homeScreen = "/home";
   static const splashScreen = "/splash";
   static const authScreen = "/auth";
   static const noteScreen = "/note";

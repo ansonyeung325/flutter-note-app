@@ -49,6 +49,7 @@ dependencies:
   flutter_quill: 9.2.10
   image_picker: 1.0.6
   flutter_keyboard_visibility: 6.0.0
+  get_it: 7.6.7
 
 dev_dependencies:
   flutter_test:

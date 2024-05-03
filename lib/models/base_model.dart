@@ -5,7 +5,7 @@ class BaseModel {
   Timestamp createdAt;
   Timestamp? updatedAt;
 
-  BaseModel({required this.docId,required this.createdAt,this.updatedAt}){
+  BaseModel({required this.docId, required this.createdAt, this.updatedAt}) {
     updatedAt ??= Timestamp.fromDate(DateTime.now());
   }
 }

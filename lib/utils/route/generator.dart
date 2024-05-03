@@ -1,3 +1,4 @@
+import 'package:couple/models/note_model.dart';
 import 'package:couple/models/user_profile_model.dart';
 import 'package:couple/screens/auth_screen.dart';
 import 'package:couple/screens/home_screens.dart';
@@ -13,28 +14,28 @@ class RouteGenerator with RouteAware {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final arg = settings.arguments;
     switch (settings.name) {
-      case routePath.splashScreen:
+      case RoutePath.splashScreen:
         logger(message: "Current route: ${settings.name}", from: "Router");
         return MaterialPageRoute(
             settings: settings, builder: (_) => const SplashScreen());
-      case routePath.homeScreen:
+      case RoutePath.homeScreen:
         logger(message: "Current route: ${settings.name}", from: "Router");
         return MaterialPageRoute(
             settings: settings, builder: (_) => const HomeScreen());
-      case routePath.noteScreen:
+      case RoutePath.noteScreen:
         logger(message: "Current route: ${settings.name}", from: "Router");
         return MaterialPageRoute(
             settings: settings,
-            builder: (_) => NoteScreen(content: arg as String));
-      case routePath.authScreen:
+            builder: (_) => NoteScreen(note: arg as NoteModel));
+      case RoutePath.authScreen:
         logger(message: "Current route: ${settings.name}", from: "Router");
         return MaterialPageRoute(
             settings: settings, builder: (_) => const AuthScreen());
-      case routePath.settingScreen:
+      case RoutePath.settingScreen:
         logger(message: "Current route: ${settings.name}", from: "Router");
         return MaterialPageRoute(
             settings: settings, builder: (_) => const SettingScreen());
-      case routePath.profileScreen:
+      case RoutePath.profileScreen:
         logger(message: "Current route: ${settings.name}", from: "Router");
         return MaterialPageRoute(
             settings: settings,

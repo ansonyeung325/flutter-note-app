@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:couple/models/note_model.dart';
 import 'package:couple/utils/components/quill_text_editor.dart';
 import 'package:couple/utils/logger.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +7,9 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
 class NoteScreen extends StatefulWidget {
-  const NoteScreen({required this.content, super.key});
+  const NoteScreen({required this.note, super.key});
 
-  final String? content;
+  final NoteModel? note;
 
   @override
   State<NoteScreen> createState() => _NoteScreenState();
@@ -23,8 +24,8 @@ class _NoteScreenState extends State<NoteScreen> {
   final TextEditingController _titleController = TextEditingController();
   final QuillController _quillController = QuillController.basic();
   final FocusNode _quillFocusNode = FocusNode();
-  String? oldContent;
-  String? newContent;
+  NoteModel? oldNote;
+  NoteModel? newNote;
   String title = "New Note";
   bool isTyping = false;
 
@@ -51,9 +52,15 @@ class _NoteScreenState extends State<NoteScreen> {
       },
     );
 
-    if (widget.content != null) {
-      oldContent = widget.content!;
+    if (widget.note != null) {
+      oldNote = widget.note!;
+      title = oldNote!.title!;
+      _titleController.text = title;
+      _quillController.document.insert(0, oldNote!.content.toString());
     }
+    logger(
+        message:
+            "Widget is not null ${oldNote?.title} content: ${oldNote?.content}");
   }
 
   void autoSaveContent() {
@@ -67,7 +74,7 @@ class _NoteScreenState extends State<NoteScreen> {
     return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: Text(title.isEmpty ? "New Note" : title),
+          title: Text(title),
           automaticallyImplyLeading: false,
           scrolledUnderElevation: 0,
           backgroundColor: Colors.transparent,
@@ -83,15 +90,30 @@ class _NoteScreenState extends State<NoteScreen> {
             ],
           ),
           actions: [
-            PopupMenuButton(
-                position: PopupMenuPosition.under,
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                      onTap: (){
-                        logger(from: "Note Screen",message: "${_quillController.document.toDelta().toJson()}");
-                      },
-                      child: Text("Save",style: Theme.of(context).textTheme.bodyLarge))
-                ])
+            KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+              if (isKeyboardVisible) {
+                return TextButton(
+                    onPressed: () {
+                      ///UnFocus QuillEditor
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
+                    child: Text("Finish"));
+              } else {
+                return PopupMenuButton(
+                    position: PopupMenuPosition.under,
+                    itemBuilder: (context) => [
+                          PopupMenuItem(
+                              onTap: () {
+                                logger(
+                                    from: "Note Screen",
+                                    message:
+                                        "${_quillController.document.toDelta().toJson()}");
+                              },
+                              child: Text("Save",
+                                  style: Theme.of(context).textTheme.bodyLarge))
+                        ]);
+              }
+            }),
           ],
         ),
         body: SafeArea(

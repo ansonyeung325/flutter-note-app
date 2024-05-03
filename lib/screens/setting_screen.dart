@@ -66,16 +66,6 @@ class _StateSettingScreen extends State<SettingScreen> {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                settingRow(
-                    leading: const Icon(Icons.dark_mode_outlined),
-                    title: 'Dark Mode',
-                    value: appState.isDarkMode,
-                    func: (value) {
-                      setState(() {
-                        appState.toggleTheme();
-                        debugPrint("${appState.appTheme.primaryColor}");
-                      });
-                    }),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -88,7 +78,7 @@ class _StateSettingScreen extends State<SettingScreen> {
                                     side: BorderSide(color: Colors.orange)))),
                         onPressed: () {
                           authState.signOut();
-                          Navigator.pushReplacementNamed(context, routePath.authScreen);
+                          Navigator.pushReplacementNamed(context, RoutePath.authScreen);
                         },
                         child: Row(
                           children: [
