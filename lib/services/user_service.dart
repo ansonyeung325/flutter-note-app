@@ -20,19 +20,21 @@ class UserService {
       await usersRef.doc(newProfile.docId).set(newProfile.toJson());
       return newProfile;
     } catch (error) {
-      debugPrint("$error");
+      logger(from: "User Service create method error",message: "$error");
       return null;
     }
   }
 
-  Future<SettingModel?> updateSetting(String uid, SettingModel setting) async {
-    try {} catch (error) {
-      logger(from: "UserService updateSetting", message: "$error");
-    }
-  }
+  // Future<SettingModel?> updateSetting(String uid, SettingModel setting) async {
+  //   try {} catch (error) {
+  //     logger(from: "UserService updateSetting", message: "$error");
+  //   }
+  // }
 
   Future<UserProfileModel?> update(UserProfileModel newProfile) async {
     ImageModel? profileImage;
+
+    newProfile.updatedAt = Timestamp.fromDate(DateTime.now());
     try {
       if (newProfile.profileImage != null) {
         await mediaService.uploadImage(newProfile.profileImage!);
@@ -44,7 +46,7 @@ class UserService {
       updatedProfile?.profileImage = profileImage;
       return updatedProfile;
     } catch (error) {
-      debugPrint("$error");
+      logger(from: "User Service update method error",message: "$error");
       return null;
     }
   }
@@ -62,7 +64,7 @@ class UserService {
       }
       return profile;
     } catch (error) {
-      debugPrint("$error");
+      logger(from: "User Service GET method error",message: "$error");
       return null;
     }
   }

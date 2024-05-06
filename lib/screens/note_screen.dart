@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:couple/models/note_model.dart';
 import 'package:couple/utils/components/quill_text_editor.dart';
+import 'package:couple/utils/constant.dart';
 import 'package:couple/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -33,7 +34,7 @@ class _NoteScreenState extends State<NoteScreen> {
   void initState() {
     super.initState();
     loadData();
-    autoSaveContent();
+    // autoSaveContent();
   }
 
   @override
@@ -59,22 +60,22 @@ class _NoteScreenState extends State<NoteScreen> {
       _quillController.document.insert(0, oldNote!.content.toString());
     }
     logger(
+        from: "Note Screen line 62",
         message:
             "Widget is not null ${oldNote?.title} content: ${oldNote?.content}");
   }
 
-  void autoSaveContent() {
-    _quillController.document.changes.listen((event) async {
-      await Future.delayed(const Duration(seconds: 3));
-    });
-  }
+  // void autoSaveContent() {
+  //   _quillController.document.changes.listen((event) async {
+  //     await Future.delayed(const Duration(seconds: 3));
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: Text(title),
           automaticallyImplyLeading: false,
           scrolledUnderElevation: 0,
           backgroundColor: Colors.transparent,
@@ -84,7 +85,7 @@ class _NoteScreenState extends State<NoteScreen> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                icon: const Icon(Icons.arrow_back),
                 highlightColor: Colors.transparent,
               )
             ],
@@ -96,8 +97,12 @@ class _NoteScreenState extends State<NoteScreen> {
                     onPressed: () {
                       ///UnFocus QuillEditor
                       FocusManager.instance.primaryFocus?.unfocus();
+
+                      ///Save content
                     },
-                    child: Text("Finish"));
+                    child: Text("Finish",
+                        style: TextStyle(
+                            color: ColorConstant.primaryColor, fontSize: 16)));
               } else {
                 return PopupMenuButton(
                     position: PopupMenuPosition.under,

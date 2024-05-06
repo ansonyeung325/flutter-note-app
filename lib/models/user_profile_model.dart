@@ -33,16 +33,18 @@ class UserProfileModel extends BaseModel {
             docId: profile.docId,
             profileImage: profile.profileImage,
             setting: profile.setting,
-            createdAt: profile.createdAt);
+            createdAt: profile.createdAt,
+            updatedAt: profile.updatedAt);
 
   Map<String, dynamic> toJson() {
     return {
       UserProfileModelKeys.uid: uid,
       UserProfileModelKeys.username: username,
       UserProfileModelKeys.email: email,
-      UserProfileModelKeys.setting: setting,
+      UserProfileModelKeys.setting: setting.toJson(),
       UserProfileModelKeys.profileImage: profileImage?.name,
       BaseModelKeys.createdAt: createdAt,
+      BaseModelKeys.updatedAt: updatedAt,
     };
   }
 
@@ -56,7 +58,7 @@ class UserProfileModel extends BaseModel {
               name: docSnapshot.get(UserProfileModelKeys.profileImage),
               data: null)
           : null,
-      setting: SettingModel.fromSnapshot(
+      setting: SettingModel.fromObject(
           docSnapshot.get(UserProfileModelKeys.setting)),
       docId: docSnapshot.get(BaseModelKeys.docId),
       createdAt: docSnapshot.get(BaseModelKeys.createdAt),

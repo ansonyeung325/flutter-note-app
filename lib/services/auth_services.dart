@@ -50,7 +50,7 @@ class AuthServices {
           await UserService().getByUid(credential.user!.uid);
       logger(
           message:
-              "Snapshot From User Collection: ${profile?.setting.isNotificationOn}");
+              "Setting: isNotificationOn: ${profile?.setting.isNotificationOn}");
       return profile;
     } catch (error) {
       debugPrint("Service Error: $error");

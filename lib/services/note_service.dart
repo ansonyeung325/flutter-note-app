@@ -15,11 +15,32 @@ class NoteService {
 
   Future<NoteModel?> create(NoteModel newNote) async {
     try {
-      await notesRef.doc(newNote.docId).set(newNote.toJson());
+      await notesRef.doc(newNote.docId).set((newNote.toJson()));
       return newNote;
     } catch (error) {
-      debugPrint("$error");
+      logger(from: "Note Service create method", message: '$error');
       return null;
+    }
+  }
+
+  Future<NoteModel?> update(NoteModel updatedNote) async {
+    updatedNote.updatedAt = Timestamp.fromDate(DateTime.now());
+
+    try {
+      await notesRef.doc(updatedNote.docId).update(updatedNote.toJson());
+      return updatedNote;
+    } catch (error) {
+      logger(from: "Note Service update method", message: '$error');
+      return null;
+    }
+  }
+
+  Future<void> delete(String noteId) async {
+    try {
+      await notesRef.doc(noteId).delete();
+      return;
+    } catch (error) {
+      logger(from: "Note Service delete method", message: '$error');
     }
   }
 
@@ -31,7 +52,7 @@ class NoteService {
           snapshot.docs.map((e) => NoteModel.fromSnapshot(e)).toList();
       return notes;
     } catch (error) {
-      debugPrint("$error");
+      logger(from: "Note Service GET method", message: '$error');
       return null;
     }
   }

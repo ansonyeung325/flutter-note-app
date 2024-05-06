@@ -8,15 +8,15 @@ class NoteModel extends BaseModel {
   String? title;
   String? content;
   String owner;
-  List<dynamic> sharedUsers;
-  bool readOnly = false;
+  List<dynamic>? sharedUsers;
+  bool? readOnly;
 
   NoteModel(
-      {this.title,
-      this.content,
+      {this.title = "Untitled",
+      this.content = "",
       required this.owner,
-      required this.readOnly,
-      required this.sharedUsers,
+      this.readOnly = true,
+      this.sharedUsers = const [],
       required Timestamp createdAt,
       Timestamp? updatedAt,
       required String docId})

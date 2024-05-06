@@ -72,7 +72,7 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
                 onTap: () {
                   Navigator.popAndPushNamed(
                       context, AppRouteName.profileScreen.enumToString(),
-                      arguments: authState.getProfile);
+                      arguments: authState.profile);
                 },
                 child: Container(
                   height: 80,
@@ -87,14 +87,14 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
                           backgroundColor: Colors.grey,
                           radius: 40,
                           backgroundImage:
-                              (authState.getProfile?.profileImage != null)
+                              (authState.profile?.profileImage != null)
                                   ? Image.memory(
-                                      authState.getProfile!.profileImage!.data!,
+                                      authState.profile!.profileImage!.data!,
                                       fit: BoxFit.fill,
                                     ).image
                                   : null,
                           child:
-                              (authState.getProfile?.profileImage?.data == null)
+                              (authState.profile?.profileImage?.data == null)
                                   ? const Icon(Icons.perm_identity_outlined)
                                   : null),
                       const SizedBox(width: 20),
@@ -104,11 +104,11 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "${authState.getProfile?.username}",
+                            "${authState.profile?.username}",
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           Text(
-                            "${authState.getProfile?.email}",
+                            "${authState.profile?.email}",
                             style: Theme.of(context).textTheme.labelLarge,
                           )
                         ],

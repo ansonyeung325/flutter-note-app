@@ -33,7 +33,7 @@ class AuthProvider extends AppProvider {
     }
   }
 
-  void signUp(
+  Future<void> signUp(
       {required String username,
       required String email,
       required String password}) async {
@@ -42,6 +42,7 @@ class AuthProvider extends AppProvider {
           username: username, email: email, password: password);
       if (profile != null) {
         setProfile(profile);
+        isLoggedIn = true;
       }
       AMessageToast.showToast(msg: "SignUp successfully");
     } on FirebaseAuthException catch (e) {
@@ -50,12 +51,13 @@ class AuthProvider extends AppProvider {
     }
   }
 
-  void signIn({required String email, required String password}) async {
+  Future<void> signIn({required String email, required String password}) async {
     try {
       UserProfileModel? profile =
           await _authService.signIn(email: email, password: password);
       if (profile != null) {
         setProfile(profile);
+        isLoggedIn = true;
       }
       AMessageToast.showToast(msg: "SignIn successfully");
     } on FirebaseAuthException catch (e) {
@@ -66,8 +68,9 @@ class AuthProvider extends AppProvider {
 
   void signOut() async {
     try {
-      AuthServices().signOut();
+      _authService.signOut();
       removeProfile();
+      isLoggedIn = false;
     } on FirebaseAuthException catch (error) {
       debugPrint("${error.message}");
     }
@@ -83,5 +86,6 @@ class AuthProvider extends AppProvider {
     notifyListeners();
   }
 
-  UserProfileModel? get getProfile => _profile;
+  UserProfileModel? get profile => _profile;
+  String? get userId => _profile?.uid;
 }

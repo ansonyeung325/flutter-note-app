@@ -51,15 +51,16 @@ class _AuthScreenState extends State<AuthScreen> {
     passwordController.dispose();
   }
 
-  Future signUp() async {
+  Future<void> signUp() async {
+    final AuthProvider authProvider =
+        Provider.of<AuthProvider>(context, listen: false);
     if (_formKey.currentState!.validate()) {
       try {
-        UserProfileModel? profile = await AuthServices().signUp(
+        await authProvider.signUp(
             email: emailController.text.trim(),
             password: passwordController.text.trim(),
             username: usernameController.text.trim());
-        if (context.mounted && profile != null) {
-          Provider.of<AuthProvider>(context, listen: false).setProfile(profile);
+        if (context.mounted && authProvider.isLoggedIn) {
           Navigator.pushNamed(context, RoutePath.homeScreen);
         }
         AMessageToast.showToast(msg: "SignUp successfully");
@@ -70,280 +71,275 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  Future<UserProfileModel?> signIn() async {
+  Future<void> signIn() async {
+    final AuthProvider authProvider =
+        Provider.of<AuthProvider>(context, listen: false);
     if (_formKey.currentState!.validate()) {
       try {
-        UserProfileModel? profile = await AuthServices().signIn(
+        await authProvider.signIn(
             email: emailController.text.trim(),
             password: passwordController.text.trim());
-        if (context.mounted && profile != null) {
-          Provider.of<AuthProvider>(context, listen: false).setProfile(profile);
+        if (context.mounted && authProvider.isLoggedIn) {
           Navigator.pushNamed(context, RoutePath.homeScreen);
         }
         AMessageToast.showToast(msg: "SignIn successfully");
-        return profile;
       } on FirebaseAuthException catch (e) {
         debugPrint("${e.code}: ${AuthError.getError(e.code)}");
         AMessageToast.showToast(msg: AuthError.getError(e.code));
       }
     }
-    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(builder: (context, profileProvider, child) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: SafeArea(
-            child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              SizedBox(
-                  height: 200,
-                  child: isLogin
-                      ? Lottie.asset('assets/lottieFile/welcome_gif.json',
-                          repeat: false)
-                      : Lottie.asset(
-                          'assets/lottieFile/greeting_gif.json',
-                        )),
-              Text(
-                isLogin ? "Welcome back!" : "Together!",
-                style: Theme.of(context).textTheme.headlineLarge,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Expanded(
-                child: Form(
-                  key: _formKey,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Column(
-                      children: [
-                        if (!isLogin)
-                          Row(
-                            children: [
-                              Text(
-                                "Your name",
-                                style: Theme.of(context).textTheme.labelLarge,
-                              ),
-                            ],
-                          ),
-                        if (!isLogin) labelSpacing,
-                        if (!isLogin)
-                          TextFormField(
-                            controller: usernameController,
-                            decoration: InputDecoration(
-                                fillColor: Theme.of(context)
-                                    .inputDecorationTheme
-                                    .fillColor,
-                                contentPadding: Theme.of(context)
-                                    .inputDecorationTheme
-                                    .contentPadding,
-                                suffixIcon: const Icon(Icons.person_outline),
-                                hintText: "I am Guy"),
-                          ),
-                        if (!isLogin) textFieldSpacing,
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+          child: Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            SizedBox(
+                height: 200,
+                child: isLogin
+                    ? Lottie.asset('assets/lottieFile/welcome_gif.json',
+                        repeat: false)
+                    : Lottie.asset(
+                        'assets/lottieFile/greeting_gif.json',
+                      )),
+            Text(
+              isLogin ? "Welcome back!" : "Together!",
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: Form(
+                key: _formKey,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Column(
+                    children: [
+                      if (!isLogin)
                         Row(
-                          children: [
-                            Text("Email address",
-                                style: Theme.of(context).textTheme.labelLarge)
-                          ],
-                        ),
-                        labelSpacing,
-                        TextFormField(
-                          controller: emailController,
-                          decoration: InputDecoration(
-                              fillColor: Theme.of(context)
-                                  .inputDecorationTheme
-                                  .fillColor,
-                              contentPadding: Theme.of(context)
-                                  .inputDecorationTheme
-                                  .contentPadding,
-                              suffixIcon: const Icon(Icons.email_outlined)),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return "This field is required";
-                            } else {
-                              if (EmailValidator.validate(value)) {
-                                return null;
-                              } else {
-                                return "Please provide a valid email";
-                              }
-                            }
-                          },
-                        ),
-                        textFieldSpacing,
-                        Row(
-                          children: [
-                            Text("Password",
-                                style: Theme.of(context).textTheme.labelLarge)
-                          ],
-                        ),
-                        labelSpacing,
-                        TextFormField(
-                          controller: passwordController,
-                          obscureText: !passwordVisible,
-                          decoration: InputDecoration(
-                              fillColor: Theme.of(context)
-                                  .inputDecorationTheme
-                                  .fillColor,
-                              contentPadding: Theme.of(context)
-                                  .inputDecorationTheme
-                                  .contentPadding,
-                              suffixIcon: IconButton(
-                                icon: passwordVisible
-                                    ? const Icon(Icons.visibility_outlined)
-                                    : const Icon(Icons.visibility_off_outlined),
-                                onPressed: () {
-                                  setState(() {
-                                    passwordVisible = !passwordVisible;
-                                  });
-                                },
-                              )),
-                          enableSuggestions: false,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return "This field is required";
-                            }
-                            return null;
-                          },
-                        ),
-                        const Expanded(child: SizedBox()),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ElevatedButton(
-                                    onPressed: () async {
-                                      if (isLogin) {
-                                        signIn();
-                                      } else {
-                                        signUp();
-                                      }
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(isLogin ? "Login" : "Get Start"),
-                                        const SizedBox(
-                                          width: 6,
-                                        ),
-                                        const Icon(Icons.arrow_forward_outlined)
-                                      ],
-                                    ))),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Row(
-                            children: [
-                              const Expanded(child: Divider()),
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 14),
-                                child: Text(
-                                  "or",
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                ),
-                              ),
-                              const Expanded(child: Divider())
-                            ],
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .inputDecorationTheme
-                                      .fillColor,
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(CommunityMaterialIcons.google),
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 12,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .inputDecorationTheme
-                                      .fillColor,
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: IconButton(
-                                onPressed: () {},
-                                icon:
-                                    const Icon(CommunityMaterialIcons.facebook),
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 12,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .inputDecorationTheme
-                                      .fillColor,
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(CommunityMaterialIcons.apple),
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 12,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                                isLogin
-                                    ? "Do not have an account?"
-                                    : "Already have an account?",
-                                style: Theme.of(context).textTheme.bodyMedium),
-                            const SizedBox(
-                              width: 10,
+                              "Your name",
+                              style: Theme.of(context).textTheme.labelLarge,
                             ),
-                            GestureDetector(
-                              onTap: () {
+                          ],
+                        ),
+                      if (!isLogin) labelSpacing,
+                      if (!isLogin)
+                        TextFormField(
+                          controller: usernameController,
+                          decoration: InputDecoration(
+                              fillColor: Theme.of(context)
+                                  .inputDecorationTheme
+                                  .fillColor,
+                              contentPadding: Theme.of(context)
+                                  .inputDecorationTheme
+                                  .contentPadding,
+                              suffixIcon: const Icon(Icons.person_outline),
+                              hintText: "I am Guy"),
+                        ),
+                      if (!isLogin) textFieldSpacing,
+                      Row(
+                        children: [
+                          Text("Email address",
+                              style: Theme.of(context).textTheme.labelLarge)
+                        ],
+                      ),
+                      labelSpacing,
+                      TextFormField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                            fillColor: Theme.of(context)
+                                .inputDecorationTheme
+                                .fillColor,
+                            contentPadding: Theme.of(context)
+                                .inputDecorationTheme
+                                .contentPadding,
+                            suffixIcon: const Icon(Icons.email_outlined)),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "This field is required";
+                          } else {
+                            if (EmailValidator.validate(value)) {
+                              return null;
+                            } else {
+                              return "Please provide a valid email";
+                            }
+                          }
+                        },
+                      ),
+                      textFieldSpacing,
+                      Row(
+                        children: [
+                          Text("Password",
+                              style: Theme.of(context).textTheme.labelLarge)
+                        ],
+                      ),
+                      labelSpacing,
+                      TextFormField(
+                        controller: passwordController,
+                        obscureText: !passwordVisible,
+                        decoration: InputDecoration(
+                            fillColor: Theme.of(context)
+                                .inputDecorationTheme
+                                .fillColor,
+                            contentPadding: Theme.of(context)
+                                .inputDecorationTheme
+                                .contentPadding,
+                            suffixIcon: IconButton(
+                              icon: passwordVisible
+                                  ? const Icon(Icons.visibility_outlined)
+                                  : const Icon(Icons.visibility_off_outlined),
+                              onPressed: () {
                                 setState(() {
-                                  isLogin = !isLogin;
+                                  passwordVisible = !passwordVisible;
                                 });
                               },
+                            )),
+                        enableSuggestions: false,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "This field is required";
+                          }
+                          return null;
+                        },
+                      ),
+                      const Expanded(child: SizedBox()),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (isLogin) {
+                                      signIn();
+                                    } else {
+                                      signUp();
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(isLogin ? "Login" : "Get Start"),
+                                      const SizedBox(
+                                        width: 6,
+                                      ),
+                                      const Icon(Icons.arrow_forward_outlined)
+                                    ],
+                                  ))),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Row(
+                          children: [
+                            const Expanded(child: Divider()),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 14),
                               child: Text(
-                                isLogin ? "SignUp" : "SignIn",
-                                style: TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    decorationColor:
-                                        Theme.of(context).primaryColor),
+                                "or",
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.labelLarge,
                               ),
-                            )
+                            ),
+                            const Expanded(child: Divider())
                           ],
-                        )
-                      ],
-                    ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .inputDecorationTheme
+                                    .fillColor,
+                                borderRadius: BorderRadius.circular(12)),
+                            child: IconButton(
+                              onPressed: () {},
+                              icon: const Icon(CommunityMaterialIcons.google),
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .inputDecorationTheme
+                                    .fillColor,
+                                borderRadius: BorderRadius.circular(12)),
+                            child: IconButton(
+                              onPressed: () {},
+                              icon: const Icon(CommunityMaterialIcons.facebook),
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .inputDecorationTheme
+                                    .fillColor,
+                                borderRadius: BorderRadius.circular(12)),
+                            child: IconButton(
+                              onPressed: () {},
+                              icon: const Icon(CommunityMaterialIcons.apple),
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                              isLogin
+                                  ? "Do not have an account?"
+                                  : "Already have an account?",
+                              style: Theme.of(context).textTheme.bodyMedium),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isLogin = !isLogin;
+                              });
+                            },
+                            child: Text(
+                              isLogin ? "SignUp" : "SignIn",
+                              style: TextStyle(
+                                  decoration: TextDecoration.underline,
+                                  decorationColor:
+                                      Theme.of(context).primaryColor),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
                   ),
                 ),
-              )
-            ],
-          ),
-        )),
-      );
-    });
+              ),
+            )
+          ],
+        ),
+      )),
+    );
   }
 }

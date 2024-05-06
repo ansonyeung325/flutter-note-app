@@ -22,4 +22,9 @@ class SettingModel {
       isNotificationOn: docSnapshot.get(SettingModelKeys.isNotificationOn),
     );
   }
+
+  factory SettingModel.fromObject(Map<String, dynamic> object) {
+    return SettingModel(
+        isNotificationOn: object[SettingModelKeys.isNotificationOn]);
+  }
 }

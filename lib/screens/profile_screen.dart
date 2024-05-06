@@ -145,10 +145,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: Colors.grey,
                         border: Border.all(color: Colors.grey[100]!)),
                     child: CircleAvatar(
-                      backgroundImage: authProvider.getProfile?.profileImage !=
+                      backgroundImage: authProvider.profile?.profileImage !=
                               null
                           ? Image.memory(
-                                  authProvider.getProfile!.profileImage!.data!)
+                                  authProvider.profile!.profileImage!.data!)
                               .image
                           : null,
                     )),

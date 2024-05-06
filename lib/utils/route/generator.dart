@@ -26,7 +26,7 @@ class RouteGenerator with RouteAware {
         logger(message: "Current route: ${settings.name}", from: "Router");
         return MaterialPageRoute(
             settings: settings,
-            builder: (_) => NoteScreen(note: arg as NoteModel));
+            builder: (_) => NoteScreen(note: arg as NoteModel?));
       case RoutePath.authScreen:
         logger(message: "Current route: ${settings.name}", from: "Router");
         return MaterialPageRoute(

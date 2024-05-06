@@ -9,37 +9,46 @@ import 'package:provider/provider.dart';
 class GeneralLayout extends StatelessWidget {
   final Widget widgetChild;
   final Widget? bottomSheet;
-  final Widget? bottomNavigationBar;
   final Widget? floatingActionButton;
+  final Widget? bottomNavigationBar;
   final PreferredSizeWidget? appBar;
+  final bool showBottomNavigationBar;
   const GeneralLayout(
       {super.key,
       required this.widgetChild,
       this.appBar,
-      this.bottomNavigationBar,
       this.bottomSheet,
-      this.floatingActionButton});
+      this.floatingActionButton,
+      this.showBottomNavigationBar = true,
+      this.bottomNavigationBar});
 
   final EdgeInsetsGeometry screenPadding =
       const EdgeInsets.symmetric(horizontal: 12);
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(builder: (context, authProvider, child) {
-      return Scaffold(
-          floatingActionButton: floatingActionButton,
-          bottomNavigationBar: bottomNavigationBar,
-          bottomSheet: bottomSheet,
-          drawer: const SideMenu(),
-          extendBodyBehindAppBar: false,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          appBar: appBar ??
-              AppBar(
-                  automaticallyImplyLeading: true,
-                  backgroundColor: Colors.transparent,
-                  scrolledUnderElevation: 0,
-                  elevation: 0),
-          body: widgetChild);
-    });
+    return Scaffold(
+        floatingActionButton: floatingActionButton,
+        bottomNavigationBar: showBottomNavigationBar
+            ? bottomNavigationBar ??
+                BottomAppBar(
+                  height: Theme.of(context).bottomAppBarTheme.height,
+                  color: Theme.of(context).bottomAppBarTheme.color,
+                  child: Row(
+                    children: [],
+                  ),
+                )
+            : null,
+        bottomSheet: bottomSheet,
+        drawer: const SideMenu(),
+        extendBodyBehindAppBar: false,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: appBar ??
+            AppBar(
+                automaticallyImplyLeading: true,
+                backgroundColor: Colors.transparent,
+                scrolledUnderElevation: 0,
+                elevation: 0),
+        body: widgetChild);
   }
 }
